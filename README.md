@@ -1,1 +1,1 @@
-# 🌸 Deras Planner - Daily Organizer
+# 🌸 Derawr Planner - Daily Organizer
