@@ -373,4 +373,166 @@ function renderReminders() {
             } else if (timeUntil < 86400000) {
                 timeText = `${Math.floor(timeUntil / 3600000)} jam lagi`;
             } else {
-                timeText = `${Math.floor(timeUntil / 86400000)} hari lagi
+                timeText = `${Math.floor(timeUntil / 86400000)} hari lagi`;
+            }
+            
+            const priorityEmoji = { high: '❤️', medium: '💛', low: '💚' };
+            
+            return `
+                <div class="reminder-item">
+                    <div class="reminder-icon">${priorityEmoji[task.priority]}</div>
+                    <div class="reminder-info">
+                        <div class="reminder-text">${task.text}</div>
+                        <div class="reminder-time">
+                            <i class="far fa-clock"></i> ${timeText} • ${formatDateTime(task.dueDateTime)}
+                        </div>
+                    </div>
+                    <div class="reminder-actions">
+                        <button onclick="dismissReminder(${task.id})" title="Tunda">
+                            <i class="fas fa-clock"></i>
+                        </button>
+                        <button onclick="completeTask(${task.id})" title="Selesai">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+}
+
+function updateStats() {
+    const total = tasks.length;
+    const completed = tasks.filter(t => t.completed).length;
+    const pending = total - completed;
+    const productivity = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+    document.getElementById('totalCount').textContent = total;
+    document.getElementById('completedCount').textContent = completed;
+    document.getElementById('pendingCount').textContent = pending;
+    document.getElementById('productivityScore').textContent = `${productivity}%`;
+}
+
+// ============ FILTERS ============
+
+function filterTasks(filter) {
+    currentFilter = filter;
+    
+    // Update active button
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.closest('.filter-btn').classList.add('active');
+    
+    renderTasks();
+}
+
+// ============ SETTINGS ============
+
+function openReminderSettings() {
+    document.getElementById('settingsModal').style.display = 'flex';
+    document.getElementById('dailyTime').value = settings.dailyTime;
+    document.getElementById('soundEnabled').checked = settings.soundEnabled;
+    document.getElementById('dailyEnabled').checked = settings.dailyEnabled;
+}
+
+function closeSettings() {
+    document.getElementById('settingsModal').style.display = 'none';
+}
+
+function saveSettings() {
+    settings = {
+        dailyTime: document.getElementById('dailyTime').value,
+        soundEnabled: document.getElementById('soundEnabled').checked,
+        dailyEnabled: document.getElementById('dailyEnabled').checked
+    };
+    
+    localStorage.setItem('reminderSettings', JSON.stringify(settings));
+    closeSettings();
+    showToast('✅ Pengaturan disimpan!');
+}
+
+// ============ UTILITIES ============
+
+function saveTasks() {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+function updateDateDisplay() {
+    const now = new Date();
+    const options = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    };
+    document.getElementById('dateDisplay').textContent = now.toLocaleDateString('id-ID', options);
+}
+
+function formatDateTime(dateTimeStr) {
+    if (!dateTimeStr) return '';
+    const date = new Date(dateTimeStr);
+    const options = { 
+        day: 'numeric', 
+        month: 'short', 
+        hour: '2-digit', 
+        minute: '2-digit' 
+    };
+    return date.toLocaleDateString('id-ID', options);
+}
+
+function showToast(message) {
+    // Remove existing toast
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        padding: 12px 25px;
+        border-radius: 25px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        z-index: 2000;
+        animation: slideUp 0.3s ease;
+        font-weight: 500;
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideDown 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// Add animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideUp {
+        from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+        to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
+    @keyframes slideDown {
+        from { transform: translateX(-50%) translateY(0); opacity: 1; }
+        to { transform: translateX(-50%) translateY(100px); opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
+
+// Close modal on outside click
+window.onclick = function(event) {
+    if (event.target.id === 'settingsModal') {
+        closeSettings();
+    }
+};
+
+// ============ START APP ============
+init();
