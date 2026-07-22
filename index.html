@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌸 Aesthetic Planner - Your Daily Organizer</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>🌸 Aesthetic Planner</h1>
+                <p class="subtitle">Organize your day beautifully</p>
+                <div class="date-display" id="dateDisplay"></div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Quick Add Section -->
+            <section class="quick-add">
+                <div class="input-group">
+                    <input type="text" id="taskInput" placeholder="✨ Tambahkan tugas baru..." />
+                    <select id="prioritySelect">
+                        <option value="low">💚 Low</option>
+                        <option value="medium" selected>💛 Medium</option>
+                        <option value="high">❤️ High</option>
+                    </select>
+                    <input type="date" id="dueDate" />
+                    <button id="addTaskBtn">
+                        <i class="fas fa-plus"></i> Add
+                    </button>
+                </div>
+            </section>
+
+            <!-- Stats -->
+            <section class="stats-container">
+                <div class="stat-card">
+                    <i class="fas fa-check-circle"></i>
+                    <div class="stat-info">
+                        <span class="stat-number" id="completedCount">0</span>
+                        <span class="stat-label">Completed</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-clock"></i>
+                    <div class="stat-info">
+                        <span class="stat-number" id="pendingCount">0</span>
+                        <span class="stat-label">Pending</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-star"></i>
+                    <div class="stat-info">
+                        <span class="stat-number" id="productivityScore">0%</span>
+                        <span class="stat-label">Productivity</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Filters -->
+            <section class="filters">
+                <button class="filter-btn active" data-filter="all">📋 All</button>
+                <button class="filter-btn" data-filter="active">⚡ Active</button>
+                <button class="filter-btn" data-filter="completed">✅ Completed</button>
+                <button class="filter-btn" data-filter="high">❤️ High Priority</button>
+            </section>
+
+            <!-- Task List -->
+            <section class="task-list" id="taskList">
+                <!-- Tasks will be rendered here -->
+            </section>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState">
+                <i class="fas fa-sparkles"></i>
+                <h3>Belum ada tugas!</h3>
+                <p>Tambahkan tugas pertama Anda dan mulai produktif hari ini 💪</p>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Made with 💖 for productivity | <span id="currentYear"></span></p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
