@@ -8,6 +8,121 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <!-- Notification Permission Modal -->
+    <div class="modal" id="notificationModal">
+        <div class="modal-content">
+            <div class="modal-icon">🔔</div>
+            <h2>Aktifkan Notifikasi</h2>
+            <p>Dapatkan pengingat untuk tugas-tugas penting Anda!</p>
+            <div class="modal-actions">
+                <button class="btn-primary" onclick="requestNotificationPermission()">
+                    <i class="fas fa-bell"></i> Aktifkan
+                </button>
+                <button class="btn-secondary" onclick="closeNotificationModal()">
+                    Nanti Saja
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reminder Settings Modal -->
+    <div class="modal" id="reminderSettingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚙️ Pengaturan Reminder</h2>
+                <button class="close-btn" onclick="closeReminderSettings()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <label>
+                        <i class="fas fa-clock"></i> Waktu Reminder Harian
+                    </label>
+                    <input type="time" id="dailyReminderTime" value="08:00" />
+                </div>
+                <div class="setting-group">
+                    <label>
+                        <i class="fas fa-bell"></i> Reminder Sebelum Tenggat
+                    </label>
+                    <select id="reminderBeforeDue">
+                        <option value="0">Saat tenggat waktu</option>
+                        <option value="15">15 menit sebelum</option>
+                        <option value="30">30 menit sebelum</option>
+                        <option value="60" selected>1 jam sebelum</option>
+                        <option value="120">2 jam sebelum</option>
+                        <option value="1440">1 hari sebelum</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="enableSound" checked />
+                        <i class="fas fa-volume-up"></i> Suara Notifikasi
+                    </label>
+                </div>
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="enableDailyReminder" checked />
+                        <i class="fas fa-calendar-check"></i> Reminder Harian
+                    </label>
+                </div>
+                <button class="btn-primary save-settings" onclick="saveReminderSettings()">
+                    <i class="fas fa-save"></i> Simpan Pengaturan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Task with Reminder Modal -->
+    <div class="modal" id="addTaskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✨ Tambah Tugas Baru</h2>
+                <button class="close-btn" onclick="closeAddTaskModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>📝 Nama Tugas</label>
+                    <input type="text" id="modalTaskInput" placeholder="Masukkan nama tugas..." />
+                </div>
+                <div class="form-group">
+                    <label>🎯 Prioritas</label>
+                    <select id="modalPrioritySelect">
+                        <option value="low">💚 Low</option>
+                        <option value="medium" selected>💛 Medium</option>
+                        <option value="high">❤️ High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>📅 Tenggat Waktu</label>
+                    <input type="datetime-local" id="modalDueDateTime" />
+                </div>
+                <div class="form-group">
+                    <label>🔔 Set Reminder</label>
+                    <select id="modalReminderSelect">
+                        <option value="none">Tidak ada reminder</option>
+                        <option value="0">Saat tenggat waktu</option>
+                        <option value="15">15 menit sebelum</option>
+                        <option value="30">30 menit sebelum</option>
+                        <option value="60" selected>1 jam sebelum</option>
+                        <option value="120">2 jam sebelum</option>
+                        <option value="1440">1 hari sebelum</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>🔁 Repeat</label>
+                    <select id="modalRepeatSelect">
+                        <option value="none">Tidak berulang</option>
+                        <option value="daily">Setiap hari</option>
+                        <option value="weekly">Setiap minggu</option>
+                        <option value="monthly">Setiap bulan</option>
+                    </select>
+                </div>
+                <button class="btn-primary full-width" onclick="addTaskFromModal()">
+                    <i class="fas fa-plus"></i> Tambah Tugas
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <!-- Header -->
         <header class="header">
@@ -16,23 +131,37 @@
                 <p class="subtitle">Organize your day beautifully</p>
                 <div class="date-display" id="dateDisplay"></div>
             </div>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="openReminderSettings()" title="Pengaturan Reminder">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <button class="icon-btn" onclick="testNotification()" title="Tes Notifikasi">
+                    <i class="fas fa-bell"></i>
+                </button>
+            </div>
         </header>
 
         <!-- Main Content -->
         <main class="main-content">
             <!-- Quick Add Section -->
             <section class="quick-add">
-                <div class="input-group">
-                    <input type="text" id="taskInput" placeholder="✨ Tambahkan tugas baru..." />
-                    <select id="prioritySelect">
-                        <option value="low">💚 Low</option>
-                        <option value="medium" selected>💛 Medium</option>
-                        <option value="high">❤️ High</option>
-                    </select>
-                    <input type="date" id="dueDate" />
-                    <button id="addTaskBtn">
-                        <i class="fas fa-plus"></i> Add
-                    </button>
+                <button class="add-task-btn" onclick="openAddTaskModal()">
+                    <i class="fas fa-plus-circle"></i> Tambah Tugas Baru
+                </button>
+            </section>
+
+            <!-- Upcoming Reminders -->
+            <section class="reminders-section" id="remindersSection">
+                <h3>
+                    <i class="fas fa-clock"></i> Reminder Mendatang
+                    <span class="badge" id="reminderCount">0</span>
+                </h3>
+                <div class="reminders-list" id="remindersList">
+                    <!-- Reminders will be rendered here -->
+                </div>
+                <div class="no-reminders" id="noReminders">
+                    <i class="far fa-bell-slash"></i>
+                    <p>Tidak ada reminder aktif</p>
                 </div>
             </section>
 
