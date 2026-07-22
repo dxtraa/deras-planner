@@ -1,3 +1,5 @@
+// ============ TASK MANAGER WITH REMINDERS ============
+
 let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 let currentFilter = 'all';
 let settings = JSON.parse(localStorage.getItem('reminderSettings')) || {
@@ -6,6 +8,8 @@ let settings = JSON.parse(localStorage.getItem('reminderSettings')) || {
     dailyEnabled: true
 };
 let reminderCheckInterval;
+
+// ============ INITIALIZATION ============
 
 function init() {
     updateDateDisplay();
@@ -365,15 +369,32 @@ function renderReminders() {
         section.style.display = 'block';
         list.innerHTML = activeReminders.slice(0, 5).map(task => {
             const due = new Date(task.dueDateTime);
-            const timeUntil = due - new Date();
+            const now = new Date();
+            const timeUntil = due - now;
             let timeText = '';
             
-            if (timeUntil < 3600000) {
-                timeText = `${Math.floor(timeUntil / 60000)} menit lagi`;
-            } else if (timeUntil < 86400000) {
-                timeText = `${Math.floor(timeUntil / 3600000)} jam lagi`;
-            } else {
-                timeText = `${Math.floor(timeUntil / 86400000)} hari lagi`;
+            // FIXED: Proper time calculation
+            if (timeUntil <= 0) {
+                timeText = '⏰ Sekarang!';
+            } else if (timeUntil < 3600000) { // kurang dari 1 jam (3600000 ms)
+                const minutes = Math.max(1, Math.ceil(timeUntil / 60000)); // Minimal 1 menit
+                timeText = `${minutes} menit lagi`;
+            } else if (timeUntil < 86400000) { // kurang dari 24 jam (86400000 ms)
+                const hours = Math.floor(timeUntil / 3600000);
+                const minutes = Math.floor((timeUntil % 3600000) / 60000);
+                if (minutes > 0 && hours < 5) { // Tampilkan menit jika kurang dari 5 jam
+                    timeText = `${hours} jam ${minutes} menit lagi`;
+                } else {
+                    timeText = `${hours} jam lagi`;
+                }
+            } else { // lebih dari 24 jam
+                const days = Math.floor(timeUntil / 86400000);
+                const hours = Math.floor((timeUntil % 86400000) / 3600000);
+                if (hours > 0 && days < 3) { // Tampilkan jam jika kurang dari 3 hari
+                    timeText = `${days} hari ${hours} jam lagi`;
+                } else {
+                    timeText = `${days} hari lagi`;
+                }
             }
             
             const priorityEmoji = { high: '❤️', medium: '💛', low: '💚' };
