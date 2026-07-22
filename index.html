@@ -3,123 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌸 Aesthetic Planner - Your Daily Organizer</title>
+    <title>🌸 Aesthetic Planner with Reminders</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Notification Permission Modal -->
-    <div class="modal" id="notificationModal">
-        <div class="modal-content">
-            <div class="modal-icon">🔔</div>
-            <h2>Aktifkan Notifikasi</h2>
-            <p>Dapatkan pengingat untuk tugas-tugas penting Anda!</p>
-            <div class="modal-actions">
-                <button class="btn-primary" onclick="requestNotificationPermission()">
-                    <i class="fas fa-bell"></i> Aktifkan
-                </button>
-                <button class="btn-secondary" onclick="closeNotificationModal()">
-                    Nanti Saja
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Reminder Settings Modal -->
-    <div class="modal" id="reminderSettingsModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>⚙️ Pengaturan Reminder</h2>
-                <button class="close-btn" onclick="closeReminderSettings()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="setting-group">
-                    <label>
-                        <i class="fas fa-clock"></i> Waktu Reminder Harian
-                    </label>
-                    <input type="time" id="dailyReminderTime" value="08:00" />
-                </div>
-                <div class="setting-group">
-                    <label>
-                        <i class="fas fa-bell"></i> Reminder Sebelum Tenggat
-                    </label>
-                    <select id="reminderBeforeDue">
-                        <option value="0">Saat tenggat waktu</option>
-                        <option value="15">15 menit sebelum</option>
-                        <option value="30">30 menit sebelum</option>
-                        <option value="60" selected>1 jam sebelum</option>
-                        <option value="120">2 jam sebelum</option>
-                        <option value="1440">1 hari sebelum</option>
-                    </select>
-                </div>
-                <div class="setting-group">
-                    <label>
-                        <input type="checkbox" id="enableSound" checked />
-                        <i class="fas fa-volume-up"></i> Suara Notifikasi
-                    </label>
-                </div>
-                <div class="setting-group">
-                    <label>
-                        <input type="checkbox" id="enableDailyReminder" checked />
-                        <i class="fas fa-calendar-check"></i> Reminder Harian
-                    </label>
-                </div>
-                <button class="btn-primary save-settings" onclick="saveReminderSettings()">
-                    <i class="fas fa-save"></i> Simpan Pengaturan
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Task with Reminder Modal -->
-    <div class="modal" id="addTaskModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>✨ Tambah Tugas Baru</h2>
-                <button class="close-btn" onclick="closeAddTaskModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>📝 Nama Tugas</label>
-                    <input type="text" id="modalTaskInput" placeholder="Masukkan nama tugas..." />
-                </div>
-                <div class="form-group">
-                    <label>🎯 Prioritas</label>
-                    <select id="modalPrioritySelect">
-                        <option value="low">💚 Low</option>
-                        <option value="medium" selected>💛 Medium</option>
-                        <option value="high">❤️ High</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>📅 Tenggat Waktu</label>
-                    <input type="datetime-local" id="modalDueDateTime" />
-                </div>
-                <div class="form-group">
-                    <label>🔔 Set Reminder</label>
-                    <select id="modalReminderSelect">
-                        <option value="none">Tidak ada reminder</option>
-                        <option value="0">Saat tenggat waktu</option>
-                        <option value="15">15 menit sebelum</option>
-                        <option value="30">30 menit sebelum</option>
-                        <option value="60" selected>1 jam sebelum</option>
-                        <option value="120">2 jam sebelum</option>
-                        <option value="1440">1 hari sebelum</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>🔁 Repeat</label>
-                    <select id="modalRepeatSelect">
-                        <option value="none">Tidak berulang</option>
-                        <option value="daily">Setiap hari</option>
-                        <option value="weekly">Setiap minggu</option>
-                        <option value="monthly">Setiap bulan</option>
-                    </select>
-                </div>
-                <button class="btn-primary full-width" onclick="addTaskFromModal()">
-                    <i class="fas fa-plus"></i> Tambah Tugas
-                </button>
-            </div>
+    <!-- Notification Permission Banner -->
+    <div class="notification-banner" id="notificationBanner" style="display: none;">
+        <div class="banner-content">
+            <i class="fas fa-bell"></i>
+            <span>Izinkan notifikasi untuk mendapatkan reminder tugas!</span>
+            <button onclick="requestNotification()" class="banner-btn">Izinkan</button>
+            <button onclick="hideBanner()" class="banner-close">&times;</button>
         </div>
     </div>
 
@@ -128,14 +23,14 @@
         <header class="header">
             <div class="header-content">
                 <h1>🌸 Aesthetic Planner</h1>
-                <p class="subtitle">Organize your day beautifully</p>
+                <p class="subtitle">Organize your day with reminders</p>
                 <div class="date-display" id="dateDisplay"></div>
             </div>
-            <div class="header-actions">
-                <button class="icon-btn" onclick="openReminderSettings()" title="Pengaturan Reminder">
+            <div class="header-buttons">
+                <button onclick="openReminderSettings()" class="icon-btn" title="Pengaturan Reminder">
                     <i class="fas fa-cog"></i>
                 </button>
-                <button class="icon-btn" onclick="testNotification()" title="Tes Notifikasi">
+                <button onclick="testReminder()" class="icon-btn" title="Tes Reminder">
                     <i class="fas fa-bell"></i>
                 </button>
             </div>
@@ -143,42 +38,67 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Quick Add Section -->
-            <section class="quick-add">
-                <button class="add-task-btn" onclick="openAddTaskModal()">
-                    <i class="fas fa-plus-circle"></i> Tambah Tugas Baru
-                </button>
+            <!-- Add Task Form -->
+            <section class="add-task-section">
+                <h3><i class="fas fa-plus-circle"></i> Tambah Tugas Baru</h3>
+                <div class="task-form">
+                    <input type="text" id="taskInput" placeholder="✨ Apa yang ingin kamu kerjakan?" class="task-input">
+                    
+                    <div class="form-row">
+                        <select id="prioritySelect" class="form-select">
+                            <option value="low">💚 Low Priority</option>
+                            <option value="medium" selected>💛 Medium Priority</option>
+                            <option value="high">❤️ High Priority</option>
+                        </select>
+                        
+                        <input type="datetime-local" id="dueDateTime" class="form-input">
+                    </div>
+                    
+                    <div class="form-row">
+                        <select id="reminderSelect" class="form-select">
+                            <option value="none">🔕 No Reminder</option>
+                            <option value="5">⏰ 5 menit sebelum</option>
+                            <option value="15">⏰ 15 menit sebelum</option>
+                            <option value="30">⏰ 30 menit sebelum</option>
+                            <option value="60" selected>⏰ 1 jam sebelum</option>
+                            <option value="120">⏰ 2 jam sebelum</option>
+                            <option value="1440">⏰ 1 hari sebelum</option>
+                        </select>
+                        
+                        <button onclick="addTask()" class="add-btn">
+                            <i class="fas fa-plus"></i> Tambah
+                        </button>
+                    </div>
+                </div>
             </section>
 
-            <!-- Upcoming Reminders -->
-            <section class="reminders-section" id="remindersSection">
-                <h3>
-                    <i class="fas fa-clock"></i> Reminder Mendatang
-                    <span class="badge" id="reminderCount">0</span>
-                </h3>
-                <div class="reminders-list" id="remindersList">
-                    <!-- Reminders will be rendered here -->
-                </div>
-                <div class="no-reminders" id="noReminders">
-                    <i class="far fa-bell-slash"></i>
-                    <p>Tidak ada reminder aktif</p>
-                </div>
+            <!-- Active Reminders -->
+            <section class="reminders-section" id="remindersSection" style="display: none;">
+                <h3><i class="fas fa-clock"></i> Reminder Aktif</h3>
+                <div id="remindersList" class="reminders-list"></div>
             </section>
 
             <!-- Stats -->
             <section class="stats-container">
-                <div class="stat-card">
-                    <i class="fas fa-check-circle"></i>
+                <div class="stat-card" onclick="filterTasks('all')">
+                    <i class="fas fa-list"></i>
                     <div class="stat-info">
-                        <span class="stat-number" id="completedCount">0</span>
-                        <span class="stat-label">Completed</span>
+                        <span class="stat-number" id="totalCount">0</span>
+                        <span class="stat-label">Total</span>
                     </div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card" onclick="filterTasks('active')">
                     <i class="fas fa-clock"></i>
                     <div class="stat-info">
                         <span class="stat-number" id="pendingCount">0</span>
                         <span class="stat-label">Pending</span>
+                    </div>
+                </div>
+                <div class="stat-card" onclick="filterTasks('completed')">
+                    <i class="fas fa-check-circle"></i>
+                    <div class="stat-info">
+                        <span class="stat-number" id="completedCount">0</span>
+                        <span class="stat-label">Completed</span>
                     </div>
                 </div>
                 <div class="stat-card">
@@ -192,28 +112,64 @@
 
             <!-- Filters -->
             <section class="filters">
-                <button class="filter-btn active" data-filter="all">📋 All</button>
-                <button class="filter-btn" data-filter="active">⚡ Active</button>
-                <button class="filter-btn" data-filter="completed">✅ Completed</button>
-                <button class="filter-btn" data-filter="high">❤️ High Priority</button>
+                <button class="filter-btn active" onclick="filterTasks('all')">
+                    <i class="fas fa-layer-group"></i> Semua
+                </button>
+                <button class="filter-btn" onclick="filterTasks('active')">
+                    <i class="fas fa-spinner"></i> Aktif
+                </button>
+                <button class="filter-btn" onclick="filterTasks('completed')">
+                    <i class="fas fa-check"></i> Selesai
+                </button>
+                <button class="filter-btn" onclick="filterTasks('reminder')">
+                    <i class="fas fa-bell"></i> Ada Reminder
+                </button>
             </section>
 
             <!-- Task List -->
-            <section class="task-list" id="taskList">
-                <!-- Tasks will be rendered here -->
-            </section>
+            <section class="task-list" id="taskList"></section>
 
             <!-- Empty State -->
             <div class="empty-state" id="emptyState">
-                <i class="fas fa-sparkles"></i>
-                <h3>Belum ada tugas!</h3>
-                <p>Tambahkan tugas pertama Anda dan mulai produktif hari ini 💪</p>
+                <i class="fas fa-clipboard-list"></i>
+                <h3>Belum ada tugas nih!</h3>
+                <p>Yuk tambah tugas pertama kamu dan mulai produktif 🚀</p>
             </div>
         </main>
 
-        <!-- Footer -->
+        <!-- Reminder Settings Modal -->
+        <div class="modal-overlay" id="settingsModal" style="display: none;">
+            <div class="modal-box">
+                <div class="modal-header">
+                    <h2><i class="fas fa-cog"></i> Pengaturan Reminder</h2>
+                    <button onclick="closeSettings()" class="close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="setting-item">
+                        <label><i class="fas fa-clock"></i> Reminder Harian</label>
+                        <input type="time" id="dailyTime" value="08:00" class="form-input">
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="soundEnabled" checked>
+                            <i class="fas fa-volume-up"></i> Suara Notifikasi
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label>
+                            <input type="checkbox" id="dailyEnabled" checked>
+                            <i class="fas fa-calendar-check"></i> Ringkasan Harian
+                        </label>
+                    </div>
+                    <button onclick="saveSettings()" class="save-btn">
+                        <i class="fas fa-save"></i> Simpan Pengaturan
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <footer class="footer">
-            <p>Made with 💖 for productivity | <span id="currentYear"></span></p>
+            <p>Made with 💖 | <span id="currentYear"></span></p>
         </footer>
     </div>
 
